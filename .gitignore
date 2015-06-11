@@ -1,0 +1,7 @@
+*.class
+target/classes/.netbeans_automatic_build
+*.properties
+target/RPSGame-1.0-SNAPSHOT.jar
+target/*
+target/
+target
