@@ -24,7 +24,7 @@ public class PlayState extends BasicGameState {
     
     public PlayState(String name) {
         this.name = name;
-        gameOverMenu = new Rectangle(Main.WIDTH, Main.HEIGHT, 0, 0);
+        gameOverMenu = new Rectangle(0, 0, Main.WIDTH, Main.HEIGHT);
         
     }
 
@@ -43,7 +43,7 @@ public class PlayState extends BasicGameState {
         play.render(gc.getGraphics());
         if(play.getGameOver()) {
             g.setColor(Color.gray);
-            g.draw(gameOverMenu);
+            g.fill(gameOverMenu);
             g.setColor(Color.white);
             g.drawString("Game Over!", Main.WIDTH / 2 - 50, Main.HEIGHT / 2);
             if(play.getAiHp() <= 0) {
