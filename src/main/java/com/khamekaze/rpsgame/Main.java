@@ -25,7 +25,7 @@ public class Main extends StateBasedGame{
     @Override
     public void initStatesList(GameContainer gc) {
         addState(new PlayState("Game"));
-        
+        enterState(PLAYSTATE);
     }
     
     public static void main(String[] args) {

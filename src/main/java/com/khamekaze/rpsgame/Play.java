@@ -2,6 +2,9 @@ package com.khamekaze.rpsgame;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -23,6 +26,9 @@ public class Play {
     private Shape hbDH, hbDM, hbDB, hbAH, hbAM, hbAB;
     private ArrayList<Shape> hitboxes;
     private String outcome;
+    
+    private Animation playerHitAiHead;
+    private Image[] playerHitAiHeadSeq;
     
     private int aiHP, playerHP;
     private int aiAttack = 1, playerAttack = 1;
@@ -46,6 +52,8 @@ public class Play {
         attackImages.add(attackAreaM);
         attackImages.add(attackAreaB);
         
+        loadAnimations();
+        
         hbDH = new Rectangle(100, 100, 75, 75);
         hbDM = new Rectangle(100, 200, 75, 75);
         hbDB = new Rectangle(100, 300, 75, 75);
@@ -67,18 +75,54 @@ public class Play {
         
     }
     
+    public void loadAnimations() {
+        playerHitAiHeadSeq = new Image[14];
+        try {
+            playerHitAiHeadSeq[0] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0001.png");
+            playerHitAiHeadSeq[1] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0002.png");
+            playerHitAiHeadSeq[2] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0003.png");
+            playerHitAiHeadSeq[3] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0004.png");
+            playerHitAiHeadSeq[4] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0005.png");
+            playerHitAiHeadSeq[5] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0006.png");
+            playerHitAiHeadSeq[6] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0007.png");
+            playerHitAiHeadSeq[7] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0008.png");
+            playerHitAiHeadSeq[8] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0009.png");
+            playerHitAiHeadSeq[9] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0010.png");
+            playerHitAiHeadSeq[10] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0011.png");
+            playerHitAiHeadSeq[11] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0012.png");
+            playerHitAiHeadSeq[12] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0013.png");
+            playerHitAiHeadSeq[13] = new Image("src/main/resources/img/spritesheets/sequence1/testAnimation0014.png");
+        } catch (SlickException ex) {
+            System.out.println(ex.toString());
+        }
+        
+        playerHitAiHead = new Animation(playerHitAiHeadSeq, 60);
+        playerHitAiHead.setAutoUpdate(true);
+        playerHitAiHead.setLooping(false);
+        playerHitAiHead.stop();
+    }
+    
     public void render(Graphics g) {
+        playerHitAiHead.draw();
+        
         int placeX = 100, placeY = 100;
         for(int i = 0; i < 3; i++) {
-            attackImages.get(i).draw(placeX + 700, placeY * (i + 1));
+            if(!playerHitAiHead.isStopped())
+                attackImages.get(i).draw(placeX + 700, placeY * (i + 1), new Color(1.0f, 1.0f, 1.0f, 0.5f));
+            else
+                attackImages.get(i).draw(placeX + 700, placeY * (i + 1));
         }
         
         for(int i = 0; i < 3; i++) {
-            defenceImages.get(i).draw(placeX, placeY * (i + 1));
+            if(!playerHitAiHead.isStopped())
+                defenceImages.get(i).draw(placeX, placeY * (i + 1), new Color(1.0f, 1.0f, 1.0f, 0.5f));
+            else
+                defenceImages.get(i).draw(placeX, placeY * (i + 1));
         }
         
         for(Shape s : hitboxes) {
-            g.draw(s);
+            if(playerHitAiHead.isStopped())
+                g.draw(s);
         }
         
         if(outcome != null) {
@@ -94,9 +138,11 @@ public class Play {
         
     }
     
-    public void update(Input i) {
-        checkAttackOrDefence(i);
+    public void update(Input i, int delta) {
+        if(playerHitAiHead.isStopped())
+            checkAttackOrDefence(i);
         checkIfGameOver();
+        resetAnimation(playerHitAiHead);
     }
     
     public void checkAttackOrDefence(Input i) {
@@ -187,6 +233,8 @@ public class Play {
                         outcome = "Player hit AI Head";
                         aiHP -= playerAttack;
                         playerAttack = 1;
+                        playerHitAiHead.start();
+                        
                     }
                     else if(ai == 3) {
                         outcome = "AI hit Player Bottom";
@@ -201,11 +249,13 @@ public class Play {
                     else if(ai == 5) {
                         outcome = "Player hit AI Head";
                         aiHP -= playerAttack;
+                        playerHitAiHead.start();
                         playerAttack = 1;
                     }
                     else if(ai == 6) {
                         outcome = "Player hit AI Head";
                         aiHP -= playerAttack;
+                        playerHitAiHead.start();
                         playerAttack = 1;
                     }
                     break;
@@ -283,6 +333,14 @@ public class Play {
             gameOver = true;
     }
     
+    public void resetAnimation(Animation anim) {
+        if(anim.isStopped()) {
+            anim.setCurrentFrame(0);
+            anim.restart();
+            anim.stop();
+        }
+    }
+    
     public boolean getGameOver() {
         return gameOver;
     }
@@ -321,6 +379,14 @@ public class Play {
     
     public int getAiAttack() {
         return aiAttack;
+    }
+    
+    public String getOutcomeString() {
+        return outcome;
+    }
+    
+    public void setOutcomeString(String outcome) {
+        this.outcome = outcome;
     }
 
 }

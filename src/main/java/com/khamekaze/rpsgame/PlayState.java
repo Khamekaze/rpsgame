@@ -58,7 +58,7 @@ public class PlayState extends BasicGameState {
     @Override
     public void update(GameContainer gc, StateBasedGame game, int delta) throws SlickException {
         if(!play.getGameOver())
-            play.update(gc.getInput());
+            play.update(gc.getInput(), delta);
         else if(play.getGameOver())
             gameOver(gc.getInput());
     }
@@ -69,6 +69,7 @@ public class PlayState extends BasicGameState {
             play.setPlayerHp(10);
             play.setPlayerAttack(1);
             play.setAiAttack(1);
+            play.setOutcomeString("");
             play.setGameOver(false);
         }
     }
